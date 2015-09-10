@@ -31,6 +31,7 @@
 #include "../sinks/file_sinks.h"
 #include "../sinks/stdout_sinks.h"
 #include "../sinks/syslog_sink.h"
+#include "../sinks/android_sink.h"
 
 inline void spdlog::register_logger(std::shared_ptr<logger> logger)
 {
