@@ -58,10 +58,16 @@ int main(int, char*[])
         console->set_level(spd::level::debug); // Set specific logger's log level
         console->debug("Now it should..");
 
+#if defined(__ANDROID__)
+        const std::string log_dir = "/data/local/tmp/";
+#else
+        const std::string log_dir = "logs/";
+#endif
+
         //
         // Create a file rotating logger with 5mb size max and 3 rotated files
         //
-        auto file_logger = spd::rotating_logger_mt("file_logger", "logs/mylogfile", 1048576 * 5, 3);
+        auto file_logger = spd::rotating_logger_mt("file_logger", log_dir + "mylogfile", 1048576 * 5, 3);
         for (int i = 0; i < 10; ++i)
             file_logger->info("{} * {} equals {:>10}", i, i, i*i);
 
@@ -69,7 +75,7 @@ int main(int, char*[])
         //
         // Create a daily logger - a new file is created every day on 2:30am
         //
-        auto daily_logger = spd::daily_logger_mt("daily_logger", "logs/daily", 2, 30);
+        auto daily_logger = spd::daily_logger_mt("daily_logger", log_dir + "daily", 2, 30);
 
         //
         // Customize msg format for all messages
@@ -92,7 +98,7 @@ int main(int, char*[])
         //
         size_t q_size = 1048576; //queue size must be power of 2
         spdlog::set_async_mode(q_size);
-        auto async_file = spd::daily_logger_st("async_file_logger", "logs/async_log.txt");
+        auto async_file = spd::daily_logger_st("async_file_logger", log_dir + "async_log.txt");
         async_file->info() << "This is async log.." << "Should be very fast!";
         spdlog::drop_all(); //Close all loggers
         //
