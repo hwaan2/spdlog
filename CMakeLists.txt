@@ -22,6 +22,13 @@
 # *************************************************************************/
 
 cmake_minimum_required(VERSION 3.0)
+
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.12.7.tar.gz"
+    SHA1 "b5ae065573ea2706ae1389a9048f1cabb2451f23"
+)
+
 project(spdlog VERSION 1.0.0)
 
 add_library(spdlog INTERFACE)

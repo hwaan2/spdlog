@@ -39,5 +39,21 @@ add_executable(benchmark bench.cpp)
 target_link_libraries(benchmark spdlog::spdlog)
 
 enable_testing()
-add_test(NAME RunExample COMMAND example)
-add_test(NAME RunBenchmark COMMAND benchmark)
+if(ANDROID)
+  hunter_add_package(Android-Apk)
+  list(APPEND CMAKE_MODULE_PATH "${ANDROID-APK_ROOT}")
+
+  include(AndroidApk) # android_add_test
+
+  enable_testing()
+  android_add_test(NAME RunExample COMMAND example)
+  android_add_test(NAME RunBenchmark COMMAND benchmark)
+
+  hunter_add_package(Android-SDK)
+  message("Path to `android`: ${ANDROID-SDK_ROOT}/android-sdk/tools/android")
+  message("Path to `emulator`: ${ANDROID-SDK_ROOT}/android-sdk/tools/emulator")
+  message("Path to `adb`: ${ANDROID-SDK_ROOT}/android-sdk/platform-tools/adb")
+else()
+  add_test(NAME RunExample COMMAND example)
+  add_test(NAME RunBenchmark COMMAND benchmark)
+endif()
