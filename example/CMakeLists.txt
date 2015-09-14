@@ -38,6 +38,9 @@ target_link_libraries(example spdlog::spdlog)
 add_executable(benchmark bench.cpp)
 target_link_libraries(benchmark spdlog::spdlog)
 
+add_executable(android android.cpp)
+target_link_libraries(android spdlog::spdlog log)
+
 enable_testing()
 if(ANDROID)
   hunter_add_package(Android-Apk)
@@ -46,8 +49,7 @@ if(ANDROID)
   include(AndroidApk) # android_add_test
 
   enable_testing()
-  android_add_test(NAME RunExample COMMAND example)
-  android_add_test(NAME RunBenchmark COMMAND benchmark)
+  android_add_test(NAME RunBenchmark COMMAND android)
 
   hunter_add_package(Android-SDK)
   message("Path to `android`: ${ANDROID-SDK_ROOT}/android-sdk/tools/android")

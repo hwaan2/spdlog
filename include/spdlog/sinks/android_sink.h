@@ -37,10 +37,54 @@ namespace spdlog
 {
 namespace sinks
 {
+
+class switch_converter {
+public:
+    android_LogPriority convert_to_android(spdlog::level::level_enum level)
+    {
+        switch(level)
+        {
+            case spdlog::level::trace: return ANDROID_LOG_VERBOSE;
+            case spdlog::level::debug: return ANDROID_LOG_DEBUG;
+            case spdlog::level::info: return ANDROID_LOG_INFO;
+            case spdlog::level::notice: return ANDROID_LOG_INFO;
+            case spdlog::level::warn: return ANDROID_LOG_WARN;
+            case spdlog::level::err: return ANDROID_LOG_ERROR;
+            case spdlog::level::critical: return ANDROID_LOG_FATAL;
+            case spdlog::level::alert: return ANDROID_LOG_FATAL;
+            case spdlog::level::emerg: return ANDROID_LOG_FATAL;
+        }
+    }
+};
+
+class array_converter {
+public:
+    array_converter()
+    {
+        priorities_[static_cast<int>(spdlog::level::trace)] = ANDROID_LOG_VERBOSE;
+        priorities_[static_cast<int>(spdlog::level::debug)] = ANDROID_LOG_DEBUG;
+        priorities_[static_cast<int>(spdlog::level::info)] = ANDROID_LOG_INFO;
+        priorities_[static_cast<int>(spdlog::level::notice)] = ANDROID_LOG_INFO;
+        priorities_[static_cast<int>(spdlog::level::warn)] = ANDROID_LOG_WARN;
+        priorities_[static_cast<int>(spdlog::level::err)] = ANDROID_LOG_ERROR;
+        priorities_[static_cast<int>(spdlog::level::critical)] = ANDROID_LOG_FATAL;
+        priorities_[static_cast<int>(spdlog::level::alert)] = ANDROID_LOG_FATAL;
+        priorities_[static_cast<int>(spdlog::level::emerg)] = ANDROID_LOG_FATAL;
+    }
+
+    android_LogPriority convert_to_android(spdlog::level::level_enum level)
+    {
+        return priorities_[level];
+    }
+
+private:
+    android_LogPriority priorities_[9];
+};
+
 /*
 * Android sink (logging using __android_log_write)
 */
-template<class Mutex>
+template<class Mutex, class Converter>
 class base_android_sink : public base_sink < Mutex >
 {
 public:
@@ -55,7 +99,13 @@ public:
 protected:
     void _sink_it(const details::log_msg& msg) override
     {
-        const android_LogPriority priority = convert_to_android(msg.level);
+        if (msg.level >= spdlog::level::off) {
+          return;
+        }
+        if (msg.level < spdlog::level::trace) {
+          return;
+        }
+        const android_LogPriority priority = converter_.convert_to_android(msg.level);
         const int expected_size = msg.formatted.size();
         const int size = __android_log_write(
             priority, _tag.c_str(), msg.formatted.c_str()
@@ -71,29 +121,13 @@ protected:
     }
 
 private:
-    static android_LogPriority convert_to_android(spdlog::level::level_enum level)
-    {
-        switch(level)
-        {
-            case spdlog::level::trace: return ANDROID_LOG_VERBOSE;
-            case spdlog::level::debug: return ANDROID_LOG_DEBUG;
-            case spdlog::level::info: return ANDROID_LOG_INFO;
-            case spdlog::level::notice: return ANDROID_LOG_INFO;
-            case spdlog::level::warn: return ANDROID_LOG_WARN;
-            case spdlog::level::err: return ANDROID_LOG_ERROR;
-            case spdlog::level::critical: return ANDROID_LOG_FATAL;
-            case spdlog::level::alert: return ANDROID_LOG_FATAL;
-            case spdlog::level::emerg: return ANDROID_LOG_FATAL;
-            case spdlog::level::off: throw spdlog_ex("Unexpected off");
-            default: throw spdlog_ex("Incorrect level value");
-        }
-    }
+    Converter converter_;
 
     std::string _tag;
 };
 
-typedef base_android_sink<std::mutex> android_sink_mt;
-typedef base_android_sink<details::null_mutex> android_sink_st;
+typedef base_android_sink<details::null_mutex, switch_converter> android_switch_sink;
+typedef base_android_sink<details::null_mutex, array_converter> android_array_sink;
 
 }
 }
