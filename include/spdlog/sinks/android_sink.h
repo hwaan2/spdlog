@@ -55,6 +55,10 @@ public:
 protected:
     void _sink_it(const details::log_msg& msg) override
     {
+        if (msg.level == spdlog::level::off)
+        {
+            return;
+        }
         const android_LogPriority priority = convert_to_android(msg.level);
         const int expected_size = msg.formatted.size();
         const int size = __android_log_write(
@@ -84,7 +88,6 @@ private:
             case spdlog::level::critical: return ANDROID_LOG_FATAL;
             case spdlog::level::alert: return ANDROID_LOG_FATAL;
             case spdlog::level::emerg: return ANDROID_LOG_FATAL;
-            case spdlog::level::off: throw spdlog_ex("Unexpected off");
             default: throw spdlog_ex("Incorrect level value");
         }
     }
