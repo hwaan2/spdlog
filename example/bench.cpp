@@ -1,26 +1,7 @@
-/*************************************************************************/
-/* spdlog - an extremely fast and easy to use c++11 logging library.     */
-/* Copyright (c) 2014 Gabi Melman.                                       */
-/*                                                                       */
-/* Permission is hereby granted, free of charge, to any person obtaining */
-/* a copy of this software and associated documentation files (the       */
-/* "Software"), to deal in the Software without restriction, including   */
-/* without limitation the rights to use, copy, modify, merge, publish,   */
-/* distribute, sublicense, and/or sell copies of the Software, and to    */
-/* permit persons to whom the Software is furnished to do so, subject to */
-/* the following conditions:                                             */
-/*                                                                       */
-/* The above copyright notice and this permission notice shall be        */
-/* included in all copies or substantial portions of the Software.       */
-/*                                                                       */
-/* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,       */
-/* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF    */
-/* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.*/
-/* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY  */
-/* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,  */
-/* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     */
-/* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
-/*************************************************************************/
+//
+// Copyright(c) 2015 Gabi Melman.
+// Distributed under the MIT License (http://opensource.org/licenses/MIT)
+//
 
 //
 // bench.cpp : spdlog benchmarks
@@ -54,7 +35,6 @@ int main(int argc, char* argv[])
     int queue_size = 1048576;
     int howmany = 1000000;
     int threads = 10;
-    bool auto_flush = false;
     int file_size = 30 * 1024 * 1024;
     int rotating_files = 5;
 
@@ -70,7 +50,7 @@ int main(int argc, char* argv[])
 
 
         cout << "*******************************************************************************\n";
-        cout << "Single thread, " << format(howmany)  << " iterations, auto flush=" << auto_flush << endl;
+        cout << "Single thread, " << format(howmany)  << " iterations" << endl;
         cout << "*******************************************************************************\n";
 
 #if defined(__ANDROID__)
@@ -86,7 +66,7 @@ int main(int argc, char* argv[])
         bench(howmany, spdlog::create<null_sink_st>("null_st"));
 
         cout << "\n*******************************************************************************\n";
-        cout << threads << " threads sharing same logger, " << format(howmany)  << " iterations, auto_flush=" << auto_flush << endl;
+        cout << threads << " threads sharing same logger, " << format(howmany)  << " iterations" << endl;
         cout << "*******************************************************************************\n";
 
         auto rotating_mt = spdlog::rotating_logger_mt("rotating_mt", log_dir + "rotating_mt", file_size, rotating_files, auto_flush);
@@ -94,11 +74,12 @@ int main(int argc, char* argv[])
 
 
         auto daily_mt = spdlog::daily_logger_mt("daily_mt", log_dir + "daily_mt", auto_flush);
+
         bench_mt(howmany, daily_mt, threads);
         bench(howmany, spdlog::create<null_sink_st>("null_mt"));
 
         cout << "\n*******************************************************************************\n";
-        cout << "async logging.. " << threads << " threads sharing same logger, " << format(howmany) << " iterations, auto_flush=" << auto_flush << endl;
+        cout << "async logging.. " << threads << " threads sharing same logger, " << format(howmany) << " iterations " << endl;
         cout << "*******************************************************************************\n";
 
 

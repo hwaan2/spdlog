@@ -33,10 +33,13 @@ else()
 endif()
 
 add_executable(example example.cpp)
-target_link_libraries(example spdlog::spdlog)
+target_link_libraries(example spdlog::spdlog ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(benchmark bench.cpp)
-target_link_libraries(benchmark spdlog::spdlog)
+target_link_libraries(benchmark spdlog::spdlog ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(multisink multisink.cpp)
+target_link_libraries(multisink spdlog::spdlog ${CMAKE_THREAD_LIBS_INIT})
 
 enable_testing()
 if(ANDROID)
@@ -48,6 +51,7 @@ if(ANDROID)
   enable_testing()
   android_add_test(NAME RunExample COMMAND example)
   android_add_test(NAME RunBenchmark COMMAND benchmark)
+  android_add_test(NAME RunMultisink COMMAND multisink)
 
   hunter_add_package(Android-SDK)
   message("Path to `android`: ${ANDROID-SDK_ROOT}/android-sdk/tools/android")
