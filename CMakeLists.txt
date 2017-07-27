@@ -25,8 +25,8 @@ cmake_minimum_required(VERSION 3.0)
 
 include("cmake/HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.12.7.tar.gz"
-    SHA1 "b5ae065573ea2706ae1389a9048f1cabb2451f23"
+    URL "https://github.com/ruslo/hunter/archive/v0.19.49.tar.gz"
+    SHA1 "dd8a16d1beeede2159c58f4cd478ac010545686b"
 )
 
 project(spdlog VERSION 1.0.0)
@@ -51,6 +51,11 @@ target_include_directories(
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
     "$<INSTALL_INTERFACE:include>"
 )
+
+if(ANDROID)
+  find_package(android_log REQUIRED)
+  target_link_libraries(spdlog INTERFACE android_log::android_log)
+endif()
 
 set(HEADER_BASE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
@@ -82,9 +87,14 @@ write_basic_package_version_file(
     "${version_config}" COMPATIBILITY SameMajorVersion
 )
 
-# Note: use 'targets_export_name'
-configure_file("cmake/Config.cmake.in" "${project_config}" @ONLY)
 configure_file("cmake/spdlog.pc.in" "${pkg_config}" @ONLY)
+
+# Note: use 'targets_export_name'
+configure_package_config_file(
+    "cmake/Config.cmake.in"
+    "${project_config}"
+    INSTALL_DESTINATION "${config_install_dir}"
+)
 
 install(
     TARGETS spdlog
