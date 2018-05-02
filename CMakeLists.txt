@@ -51,6 +51,10 @@ find_package(fmt CONFIG REQUIRED)
 target_link_libraries(spdlog INTERFACE fmt::fmt)
 target_compile_definitions(spdlog INTERFACE SPDLOG_FMT_EXTERNAL=1)
 
+### threads ###
+find_package(Threads REQUIRED)
+target_link_libraries(spdlog INTERFACE Threads::Threads)
+
 option(SPDLOG_BUILD_EXAMPLES "Build examples" OFF)
 option(SPDLOG_BUILD_TESTS "Build tests" OFF)
 
