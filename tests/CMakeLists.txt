@@ -3,14 +3,14 @@ project(spdlog-utests CXX)
 find_package(Threads REQUIRED)
 
 set(SPDLOG_UTESTS_SOURCES
-    errors.cpp
-    file_helper.cpp
-    file_log.cpp
+    test_errors.cpp
+    test_file_helper.cpp
+    test_file_logging.cpp
     test_misc.cpp
     test_pattern_formatter.cpp
     test_async.cpp
     includes.h
-    registry.cpp
+    test_registry.cpp
     test_macros.cpp
     utils.cpp
     utils.h
